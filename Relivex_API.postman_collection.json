@@ -1,0 +1,460 @@
+{
+  "info": {
+    "name": "Relivex Employee Centre API",
+    "description": "Complete API test collection for the Relivex MEAN Stack Employee Centre application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url",      "value": "http://localhost:5000/api" },
+    { "key": "token",         "value": "" },
+    { "key": "manager_token", "value": "" },
+    { "key": "finance_token", "value": "" },
+    { "key": "ceo_token",     "value": "" },
+    { "key": "expense_id",    "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Employee",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/register",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name",       "value": "Test User",           "type": "text" },
+                { "key": "employeeId", "value": "RLX999",              "type": "text" },
+                { "key": "country",    "value": "India",               "type": "text" },
+                { "key": "salary",     "value": "120000",              "type": "text" },
+                { "key": "role",       "value": "Employee",            "type": "text" },
+                { "key": "email",      "value": "test@relivex.com",    "type": "text" },
+                { "key": "password",   "value": "password123",         "type": "text" }
+              ]
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "if (pm.response.code === 201) {",
+                "  const json = pm.response.json();",
+                "  pm.collectionVariables.set('token', json.token);",
+                "  console.log('Token saved:', json.token);",
+                "}"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Login — Employee (RLX005 India High)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"RLX005\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "if (pm.response.code === 200) {",
+                "  pm.collectionVariables.set('token', pm.response.json().token);",
+                "}"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Login — Manager (RLX003)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"RLX003\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "if (pm.response.code === 200) {",
+                "  pm.collectionVariables.set('manager_token', pm.response.json().token);",
+                "}"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Login — Finance (RLX002)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"RLX002\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "if (pm.response.code === 200) {",
+                "  pm.collectionVariables.set('finance_token', pm.response.json().token);",
+                "}"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Login — CEO (RLX001)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"RLX001\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "if (pm.response.code === 200) {",
+                "  pm.collectionVariables.set('ceo_token', pm.response.json().token);",
+                "}"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard & Profile",
+      "item": [
+        {
+          "name": "Get Dashboard",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/users/profile",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/users/profile",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name",    "value": "Kavya Nair Updated", "type": "text" },
+                { "key": "country", "value": "India",              "type": "text" },
+                { "key": "email",   "value": "kavya.updated@relivex.com", "type": "text" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        {
+          "name": "Get All Jobs",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/jobs",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get Recommended Jobs",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/jobs/recommended",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Query",
+      "item": [
+        {
+          "name": "Submit Query",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/query",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Payslip missing for April\",\n  \"message\": \"I have not received my payslip for April 2026. Could you please check and send it?\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Queries",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/query/my",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get All Queries (Manager+)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/query/all",
+            "header": [{ "key": "Authorization", "value": "Bearer {{manager_token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Expense — Full Workflow",
+      "item": [
+        {
+          "name": "1. Submit Expense (India High — RLX005)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/expense",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 50000,\n  \"reason\": \"Annual software licensing renewal for the engineering team\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "if (pm.response.code === 201) {",
+                "  pm.collectionVariables.set('expense_id', pm.response.json().data._id);",
+                "  console.log('Expense ID saved:', pm.response.json().data._id);",
+                "}"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "2. Get My Expenses",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/expense/my",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "3. Get Pending Manager Queue",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/expense/pending-manager",
+            "header": [{ "key": "Authorization", "value": "Bearer {{manager_token}}" }]
+          }
+        },
+        {
+          "name": "4. Manager Approve Expense",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/expense/{{expense_id}}/manager",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{manager_token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"Approved\",\n  \"remarks\": \"Justified business expense, within annual budget\"\n}"
+            }
+          }
+        },
+        {
+          "name": "4b. Manager REJECT Expense (test rejection path)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/expense/{{expense_id}}/manager",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{manager_token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"Rejected\",\n  \"remarks\": \"Amount exceeds current quarter budget allocation\"\n}"
+            }
+          }
+        },
+        {
+          "name": "5. Get Pending Finance Queue",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/expense/pending-finance",
+            "header": [{ "key": "Authorization", "value": "Bearer {{finance_token}}" }]
+          }
+        },
+        {
+          "name": "6. Finance Process Expense (auto-decision)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/expense/{{expense_id}}/finance",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{finance_token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"remarks\": \"Verified against quarterly budget report\"\n}"
+            }
+          }
+        },
+        {
+          "name": "7. Get Pending CEO Queue",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/expense/pending-ceo",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ceo_token}}" }]
+          }
+        },
+        {
+          "name": "8. CEO Approve Expense",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/expense/{{expense_id}}/ceo",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ceo_token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"Approved\",\n  \"remarks\": \"Approved at executive level\"\n}"
+            }
+          }
+        },
+        {
+          "name": "8b. CEO Reject Expense",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/expense/{{expense_id}}/ceo",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ceo_token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"Rejected\",\n  \"remarks\": \"Does not meet strategic priority criteria this quarter\"\n}"
+            }
+          }
+        },
+        {
+          "name": "9. Get Expense by ID (Result)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/expense/{{expense_id}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get All Expenses (Admin view)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/expense/all",
+            "header": [{ "key": "Authorization", "value": "Bearer {{manager_token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/notifications",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Mark All Read",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/notifications/mark-all-read",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Priority Engine Tests",
+      "item": [
+        {
+          "name": "Test — India High (amount:50000, salary:110000)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/expense",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"amount\": 50000, \"reason\": \"India High priority test\" }" }
+          }
+        },
+        {
+          "name": "Test — India Medium (amount:20000)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/expense",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"amount\": 20000, \"reason\": \"India Medium priority test\" }" }
+          }
+        },
+        {
+          "name": "Test — Default (amount:3000)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/expense",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"amount\": 3000, \"reason\": \"Default priority test — below all ranges\" }" }
+          }
+        }
+      ]
+    }
+  ]
+}

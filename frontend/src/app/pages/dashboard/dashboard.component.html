@@ -1,0 +1,210 @@
+<div class="slide-up">
+  <!-- Welcome banner -->
+  <div class="welcome-banner">
+    <div class="welcome-text">
+      <h1 style="font-weight: 700;">Good day, {{ getFirstName() }} 👋</h1>
+      <p>{{ displayRole }} · {{ user?.employeeId }} · {{ user?.country }}</p>
+    </div>
+    <div class="welcome-badge">{{ displayRole }}</div>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="grid-4" style="margin:24px 0" *ngIf="isDeveloper">
+    <div class="stat-card">
+      <div class="stat-icon blue">💰</div>
+      <div class="stat-body">
+        <div class="stat-num">{{ stats?.totalExpenses || 0 }}</div>
+        <div class="stat-label">Total Requests</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">✅</div>
+      <div class="stat-body">
+        <div class="stat-num">{{ stats?.approved || 0 }}</div>
+        <div class="stat-label">Approved</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red">❌</div>
+      <div class="stat-body">
+        <div class="stat-num">{{ stats?.rejected || 0 }}</div>
+        <div class="stat-label">Rejected</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon amber">⏳</div>
+      <div class="stat-body">
+        <div class="stat-num">{{ stats?.inProgress || 0 }}</div>
+        <div class="stat-label">In Progress</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin stats -->
+  <div class="grid-4" style="margin:24px 0" *ngIf="!isDeveloper">
+    <div class="stat-card">
+      <div class="stat-icon blue">👥</div>
+      <div class="stat-body">
+        <div class="stat-num">{{ stats?.totalEmployees || 0 }}</div>
+        <div class="stat-label">Total Developers</div>
+      </div>
+    </div>
+    <div class="stat-card" *ngIf="hasApprovalRole">
+      <div class="stat-icon amber">⏳</div>
+      <div class="stat-body">
+        <div class="stat-num">{{ stats?.pendingMyWork || 0 }}</div>
+        <div class="stat-label">{{ pendingLabel }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="gap:24px">
+    <!-- Quick actions -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Quick Actions</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <button class="quick-action" (click)="nav('/expense')">
+          <div class="qa-icon">💰</div>
+          <div class="qa-label">New Expense</div>
+        </button>
+        <button class="quick-action" (click)="nav('/query')">
+          <div class="qa-icon">✉</div>
+          <div class="qa-label">Submit Query</div>
+        </button>
+        <button class="quick-action" (click)="nav('/profile')">
+          <div class="qa-icon">◉</div>
+          <div class="qa-label">Edit Profile</div>
+        </button>
+        <button class="quick-action" (click)="nav('/career')">
+          <div class="qa-icon">◈</div>
+          <div class="qa-label">View Jobs</div>
+        </button>
+        <button class="quick-action" *ngIf="isManager" (click)="nav('/approvals/manager')">
+          <div class="qa-icon">✓</div>
+          <div class="qa-label">Manager Queue</div>
+        </button>
+        <button class="quick-action" *ngIf="isFinance" (click)="nav('/approvals/finance')">
+          <div class="qa-icon">◎</div>
+          <div class="qa-label">Finance Queue</div>
+        </button>
+        <button class="quick-action" *ngIf="isCEO" (click)="nav('/approvals/ceo')">
+          <div class="qa-icon">★</div>
+          <div class="qa-label">CEO Queue</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Recent notifications -->
+    <div class="card">
+      <div class="card-header flex-between">
+        <div class="card-title">Recent Notifications</div>
+        <span class="badge badge-progress" *ngIf="notifications.length">{{ notifications.length }} new</span>
+      </div>
+      <div *ngIf="loading" class="loading-overlay"><div class="spinner"></div></div>
+      <div *ngIf="!loading">
+        <div *ngFor="let n of notifications" class="notif-row">
+          <div class="notif-dot"></div>
+          <div>
+            <div style="font-size:0.85rem;font-weight:600;color:var(--text)">{{ n.title }}</div>
+            <div style="font-size:0.78rem;color:var(--text2);margin-top:2px">{{ n.message }}</div>
+            <div style="font-size:0.72rem;color:var(--text3);margin-top:3px">{{ n.createdAt | date:'medium' }}</div>
+          </div>
+        </div>
+        <div *ngIf="notifications.length === 0" style="text-align:center;padding:24px;color:var(--text3);font-size:0.85rem">
+          No new notifications
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expense tracking for developers -->
+  <div class="card" style="margin-top:24px" *ngIf="isDeveloper">
+    <div class="card-header">
+      <div class="card-title">My Expense Requests</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Amount</th><th>Priority</th><th>Stage</th><th>Status</th><th>Submitted</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of stats.myExpenses">
+            <td><strong>$ {{ e.amount | number }}</strong></td>
+            <td>
+              <span class="badge" [ngClass]="'badge-' + (e.priority || 'default').toLowerCase()">
+                {{ e.priority || 'Pending' }}
+              </span>
+            </td>
+            <td>
+              <div class="expense-flow">
+                <div>
+                  <span [ngClass]="getStageClass(e.managerDecision?.decision)">Manager Approval</span>
+                </div>
+                <div>
+                  <span [ngClass]="getStageClass(e.financeDecision?.decision)">Finance Approval</span>
+                </div>
+                <div>
+                  <span [ngClass]="getStageClass(e.ceoDecision?.decision)">CEO Approval</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'badge-approved': e.finalStatus === 'Approved',
+                'badge-rejected': e.finalStatus === 'Rejected',
+                'badge-progress': e.finalStatus === 'In Progress'
+              }">{{ e.finalStatus }}</span>
+            </td>
+            <td>{{ e.createdAt | date:'medium' }}</td>
+            <td style="text-align:center;"><button class="btn btn-sm btn-outline" (click)="nav('/expense')">View</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="stats.myExpenses?.length === 0" style="text-align:center;padding:24px;color:var(--text3);font-size:0.85rem">
+        No expense requests yet.
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent expenses (admin) -->
+  <div class="card" style="margin-top:24px" *ngIf="!isDeveloper && stats?.recentExpenses?.length">
+    <div class="card-header">
+      <div class="card-title">Recent Expense Requests</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Developer</th><th>Amount</th><th>Priority</th><th>Stage</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of stats.recentExpenses">
+            <td>
+              <div style="font-weight:600">{{ e.employeeName }}</div>
+              <div style="font-size:0.75rem;color:var(--text2)">{{ e.employeeCode }}</div>
+            </td>
+            <td><strong>$ {{ e.amount | number }}</strong></td>
+            <td>
+              <span class="badge" [ngClass]="'badge-' + (e.priority || 'default').toLowerCase()">
+                {{ e.priority || 'Pending' }}
+              </span>
+            </td>
+            <td>{{ e.currentStage }}</td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'badge-approved': e.finalStatus === 'Approved',
+                'badge-rejected': e.finalStatus === 'Rejected',
+                'badge-progress': e.finalStatus === 'In Progress'
+              }">{{ e.finalStatus }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
