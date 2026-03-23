@@ -35,7 +35,7 @@ export class AuthService {
   get token(): string | null { return localStorage.getItem('rlx_token'); }
 
   login(employeeId: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, { employeeId, password }).pipe(
+    return this.http.post<any>(`${this.apiUrl}/login`, { employeeId, password }, { withCredentials: true }).pipe(
       tap(res => {
         if (res.success) {
           localStorage.setItem('rlx_token', res.token);
