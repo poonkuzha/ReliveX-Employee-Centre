@@ -52,7 +52,7 @@
           "assets": [
   "src/favicon.ico",
   "src/assets",
-  "src/_static.json"
+  "_static.json"
 ],
             "styles": [
               "src/assets/styles/global.scss"
