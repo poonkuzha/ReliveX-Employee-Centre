@@ -109,6 +109,62 @@ const seed = async () => {
       }
     ]);
     console.log('💼 Seeded 6 jobs');
+
+    // Adding demo expense cases to show pending approvals for Manager/Finance/CEO
+    const dev = await Employee.findOne({ employeeId: 'RLX005' });
+    const dev2 = await Employee.findOne({ employeeId: 'RLX009' });
+
+    if (dev && dev2) {
+      const existingExpenses = await Expense.countDocuments();
+      if (existingExpenses === 0) {
+        await Expense.create([
+          {
+            employeeId: dev._id,
+            employeeName: dev.name,
+            employeeCode: dev.employeeId,
+            country: dev.country,
+            salary: dev.salary,
+            amount: 12000,
+            reason: 'Travel reimbursement for client meeting',
+            currentStage: 'Manager',
+            priority: 'High',
+            managerDecision: { decision: 'Pending' },
+            financeDecision: { decision: 'Pending' },
+            ceoDecision: { decision: 'Pending' }
+          },
+          {
+            employeeId: dev2._id,
+            employeeName: dev2.name,
+            employeeCode: dev2.employeeId,
+            country: dev2.country,
+            salary: dev2.salary,
+            amount: 8500,
+            reason: 'Software license renewal',
+            currentStage: 'Finance',
+            priority: 'Medium',
+            managerDecision: { decision: 'Approved', decidedBy: new mongoose.Types.ObjectId(), decidedAt: new Date(), remarks: 'Looks good' },
+            financeDecision: { decision: 'Pending' },
+            ceoDecision: { decision: 'Pending' }
+          },
+          {
+            employeeId: dev._id,
+            employeeName: dev.name,
+            employeeCode: dev.employeeId,
+            country: dev.country,
+            salary: dev.salary,
+            amount: 15000,
+            reason: 'Hardware upgrade request',
+            currentStage: 'CEO',
+            priority: 'High',
+            managerDecision: { decision: 'Approved', decidedBy: new mongoose.Types.ObjectId(), decidedAt: new Date(), remarks: 'Approved' },
+            financeDecision: { decision: 'Approved', decidedBy: new mongoose.Types.ObjectId(), decidedAt: new Date(), remarks: 'All set' },
+            ceoDecision: { decision: 'Pending' }
+          }
+        ]);
+        console.log('📝 Seeded demo expenses for approval pipeline');
+      }
+    }
+
     console.log('ℹ️ Skipping expense/query seeding due missing end-user IDs in seed script.');
     console.log('\n✅ Database seeded successfully!\n');
     console.log('═══════════════════════════════════════════════');

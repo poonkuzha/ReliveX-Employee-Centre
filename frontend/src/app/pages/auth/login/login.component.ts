@@ -103,9 +103,9 @@ export class LoginComponent {
     { id: 'RLX001', label: '★ CEO' },
     { id: 'RLX002', label: '◎ Finance' },
     { id: 'RLX003', label: '✓ Manager' },
+    { id: 'RLX004', label: '✓ Manager (US)' },
     { id: 'RLX005', label: '◉ Developer (IN)' },
     { id: 'RLX009', label: '◉ Developer (US)' },
-    { id: 'RLX006', label: '◉ Developer (Low)' },
   ];
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
